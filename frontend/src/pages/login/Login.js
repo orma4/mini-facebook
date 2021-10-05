@@ -42,7 +42,11 @@ export const Login = () => {
           expires: new Date(dateToRemoveCookie),
         });
 
-        history.push('/wall');
+        cookies.set('userId', data.userId, {
+          path: '/',
+        });
+
+        history.push('/');
       }
     } catch (e) {
       setServerError(e.response.data);

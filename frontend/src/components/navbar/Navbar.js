@@ -1,6 +1,7 @@
 import { useHistory, useLocation } from 'react-router-dom';
 import http from '../../axios';
 import Cookies from 'universal-cookie';
+import SearchUsers from '../search-users/SearchUsers';
 
 export const Navbar = () => {
   const history = useHistory();
@@ -15,7 +16,7 @@ export const Navbar = () => {
 
       if (response.status === 200) {
         cookies.remove('token');
-        history.push('/');
+        history.push('/login');
       } else {
         throw new Error();
       }
@@ -27,14 +28,6 @@ export const Navbar = () => {
   return (
     <nav>
       <ul>
-        <li
-          onClick={() => {
-            history.push('/');
-          }}
-        >
-          Home
-        </li>
-
         {!token && (
           <>
             <li
@@ -54,8 +47,22 @@ export const Navbar = () => {
           </>
         )}
 
-        {token && <li onClick={handleLogoutClick}>Logout</li>}
+        {token && (
+          <>
+            <li
+              onClick={() => {
+                history.push('/');
+              }}
+            >
+              Home
+            </li>
+
+            <li onClick={handleLogoutClick}>Logout</li>
+          </>
+        )}
       </ul>
+
+      {token && <SearchUsers />}
     </nav>
   );
 };

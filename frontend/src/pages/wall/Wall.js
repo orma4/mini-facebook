@@ -1,96 +1,55 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { TextField, Autocomplete } from "../../ui";
-import { Button } from "@mui/material";
-import http from "../../axios";
-import { useDebounce } from "../../hooks";
-// import * as yup from 'yup';
-// import { yupResolver } from '@hookform/resolvers/yup';
-// import
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import http from '../../axios';
+import { Like, CreatePost } from '../../components';
+import Cookies from 'universal-cookie';
 
 export const Wall = () => {
   const [posts, setPosts] = useState([]);
-  // const [selectedUser, setSelectedUser] = useState();
-  const [usersOptions, setUsersOptions] = useState([]);
-  const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    // formState: { errors },
-  } = useForm();
-  const searchFieldValue = watch("test");
-  const debouncedUsersValue = useDebounce(searchFieldValue, 1000);
+  const { id } = useParams();
+  const cookies = new Cookies();
+  const currentLoggedInUserId = cookies.get('userId');
 
   useEffect(() => {
-    // Fetch all posts
-    const getAllPosts = async () => {
+    const fetchPostsByUserId = async () => {
       try {
-        const response = await http.get("/posts");
-        setPosts(response?.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getAllPosts();
-  }, []);
-
-  useEffect(() => {
-    const findUsers = async () => {
-      try {
-        const response = await http.post("/users/search", {
-          searchTerm: debouncedUsersValue,
-        });
+        const response = await http.post('/posts/user-posts', { userId: id });
 
         if (response.status === 200 && response.data) {
-          setUsersOptions(response.data);
+          setPosts(response.data);
         }
       } catch (error) {
         console.log(error);
       }
     };
 
-    if (debouncedUsersValue) {
-      findUsers();
-    }
-  }, [debouncedUsersValue]);
-
-  const onSubmit = async ({ title, description }) => {
-    try {
-      const response = await http.post("/posts/create", { title, description });
-
-      if (response.status === 200) {
-        // Add the new post to state for re-render the page with the new post after submit
-        setPosts([...posts, response.data]);
-        reset({ title: "", description: "" });
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
+    fetchPostsByUserId();
+  }, [id]);
 
   return (
     <div>
-      {/* <Autocomplete name='test' control={control} options={usersOptions} /> */}
+      {id === currentLoggedInUserId && (
+        <CreatePost posts={posts} setPosts={setPosts} />
+      )}
+      {posts.length > 0 ? <h1>Posts by you :</h1> : <h1>No posts yet</h1>}
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <TextField label="Title" name="title" control={control} />
-        <TextField label="Description" name="description" control={control} />
-        <Button type="submit" variant="contained">
-          Create Post
-        </Button>
-      </form>
-
-      {posts.map((post) => {
-        const likesLength = post.likes.length;
+      {posts.map(post => {
+        const likesLength = post?.likes?.length;
+        const userAlreadyLikedPost = post?.likes?.includes(
+          currentLoggedInUserId,
+        );
 
         return (
           <div key={post._id}>
-            <p>{post.author}</p>
-            <p>{post.title}</p>
+            <h2>{post.title}</h2>
             <p>{post.description}</p>
-            <p>{likesLength > 0 && likesLength}</p>
+            <Like
+              postId={post._id}
+              likesLength={likesLength}
+              userAlreadyLikedPost={userAlreadyLikedPost}
+              posts={posts}
+              setPosts={setPosts}
+            />
           </div>
         );
       })}

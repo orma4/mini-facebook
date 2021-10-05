@@ -35,7 +35,7 @@ export const Register = () => {
           expires: new Date(dateToRemoveCookie),
         });
 
-        history.push('/wall');
+        history.push('/');
       }
     } catch (e) {
       console.log(e);
