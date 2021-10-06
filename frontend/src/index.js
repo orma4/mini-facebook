@@ -8,11 +8,11 @@ import theme from './theme';
 
 ReactDOM.render(
   <Suspense fallback={<div>Loading...</div>}>
-    <ThemeProvider theme={theme}>
-      <Router>
+    <Router>
+      <ThemeProvider theme={theme}>
         <App />
-      </Router>
-    </ThemeProvider>
+      </ThemeProvider>
+    </Router>
   </Suspense>,
   document.getElementById('root'),
 );

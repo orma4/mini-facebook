@@ -2,12 +2,23 @@ import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import http from '../../axios';
 import { TextField } from '../../ui';
-import { Paper } from '@mui/material';
+import { Paper, Button, ClickAwayListener } from '@mui/material';
 import { useDebounce } from '../../hooks';
 import { useHistory } from 'react-router-dom';
 
+const paperStyles = {
+  position: 'absolute',
+  zIndex: '99',
+  width: '320px',
+  p: 2,
+  mt: 1.5,
+  maxHeight: '15rem',
+  overflow: 'auto',
+};
+
 export const SearchUsers = () => {
   const [usersOptions, setUsersOptions] = useState([]);
+  const [isSearchPaperOpen, setIsSearchPaperOpen] = useState(false);
   const history = useHistory();
   const {
     control,
@@ -34,20 +45,29 @@ export const SearchUsers = () => {
     };
 
     if (debouncedUsersValue) {
+      setIsSearchPaperOpen(true);
       findUsers();
     } else {
+      setIsSearchPaperOpen(false);
       setUsersOptions([]);
     }
   }, [debouncedUsersValue]);
 
   const renderUsersList = useCallback(() => {
-    if (usersOptions.length > 0) {
+    if (usersOptions.length > 0 && isSearchPaperOpen) {
       return (
-        <Paper>
+        <Paper sx={paperStyles}>
           {usersOptions.map(userOption => {
             return (
-              <div
+              <Button
                 key={userOption._id}
+                sx={{
+                  display: 'block',
+                  mb: 1,
+                  width: '100%',
+                  textAlign: 'left',
+                  p: '1rem 0',
+                }}
                 onClick={() => {
                   history.push(`/${userOption._id}`);
                   setUsersOptions([]);
@@ -55,21 +75,23 @@ export const SearchUsers = () => {
                 }}
               >
                 {userOption.fullName}
-              </div>
+              </Button>
             );
           })}
         </Paper>
       );
     } else if (usersOptions.length === 0 && searchFieldValue) {
-      return <Paper>No users found</Paper>;
+      return <Paper sx={paperStyles}>No users found</Paper>;
     }
-  }, [history, searchFieldValue, usersOptions, reset]);
+  }, [history, searchFieldValue, usersOptions, isSearchPaperOpen, reset]);
 
   return (
-    <div>
-      <TextField label='Search User...' name='searchTerm' control={control} />
-      {renderUsersList()}
-    </div>
+    <ClickAwayListener onClickAway={() => setIsSearchPaperOpen(false)}>
+      <div>
+        <TextField label='Search User...' name='searchTerm' control={control} />
+        {renderUsersList()}
+      </div>
+    </ClickAwayListener>
   );
 };
 

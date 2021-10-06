@@ -2,6 +2,17 @@ import { useHistory, useLocation } from 'react-router-dom';
 import http from '../../axios';
 import Cookies from 'universal-cookie';
 import SearchUsers from '../search-users/SearchUsers';
+import { Button, Grid, Paper, Stack, Divider, styled } from '@mui/material';
+
+const StyledNavbar = styled('nav')`
+  padding: 10px;
+  transition: all 10s;
+`;
+
+const StyledPaper = styled(Paper)`
+  padding: 10px;
+  margin: 2rem 0 4rem;
+`;
 
 export const Navbar = () => {
   const history = useHistory();
@@ -26,44 +37,48 @@ export const Navbar = () => {
   };
 
   return (
-    <nav>
-      <ul>
+    <StyledPaper>
+      <StyledNavbar>
         {!token && (
-          <>
-            <li
+          <Stack
+            direction='row'
+            divider={<Divider orientation='vertical' flexItem />}
+            spacing={2}
+          >
+            <Button
               onClick={() => {
                 history.push('/login');
               }}
             >
               Login
-            </li>
-            <li
+            </Button>
+            <Button
               onClick={() => {
                 history.push('/register');
               }}
             >
               Register
-            </li>
-          </>
+            </Button>
+          </Stack>
         )}
 
         {token && (
-          <>
-            <li
+          <Grid container justifyContent='space-between'>
+            <Button
               onClick={() => {
                 history.push('/');
               }}
             >
-              Home
-            </li>
+              Mini-Facebook
+            </Button>
 
-            <li onClick={handleLogoutClick}>Logout</li>
-          </>
+            <SearchUsers />
+
+            <Button onClick={handleLogoutClick}>Logout</Button>
+          </Grid>
         )}
-      </ul>
-
-      {token && <SearchUsers />}
-    </nav>
+      </StyledNavbar>
+    </StyledPaper>
   );
 };
 

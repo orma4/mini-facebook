@@ -1,5 +1,17 @@
 import http from '../../axios';
 import { useState } from 'react';
+import { Button, styled } from '@mui/material';
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
+import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
+
+const StyledSvgLikeButton = styled(Button)`
+  margin-top: '2rem';
+
+  svg {
+    width: 3.2rem;
+    height: 3.2rem;
+  }
+`;
 
 export const Like = ({
   postId,
@@ -43,11 +55,21 @@ export const Like = ({
 
   return (
     <div>
-      <button onClick={!userAlreadyLikedPost ? likePost : dislikePost}>
-        {isLiked || userAlreadyLikedPost ? 'Dislike' : 'Like'}
-      </button>
-
-      <p>{likesLength > 0 && likesLength}</p>
+      <StyledSvgLikeButton
+        onClick={!userAlreadyLikedPost ? likePost : dislikePost}
+        sx={{
+          minWidth: 'auto',
+          p: 0,
+          mt: '2rem',
+        }}
+      >
+        {isLiked || userAlreadyLikedPost ? (
+          <ThumbUpAltIcon />
+        ) : (
+          <ThumbUpOutlinedIcon />
+        )}
+        <p style={{ marginLeft: '1rem' }}>{likesLength > 0 && likesLength}</p>
+      </StyledSvgLikeButton>
     </div>
   );
 };

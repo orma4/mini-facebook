@@ -1,16 +1,30 @@
-import { TextField as MuiTextField } from '@mui/material';
+import { TextField as MuiTextField, styled } from '@mui/material';
 import { Controller } from 'react-hook-form';
+import { mobile } from '../../utils/screen-sizes';
+
+const StyledTextField = styled(MuiTextField)`
+  width: 35rem;
+
+  .MuiOutlinedInput-root {
+    background: #f4f5f8;
+  }
+
+  @media ${mobile} {
+    width: 25rem;
+  }
+`;
 
 export const TextField = ({
   name,
   label,
   control,
-  type,
+  type = 'text',
   disabled,
   helperText,
   defaultValue = '',
   error,
   className,
+  ...props
 }) => {
   return (
     <Controller
@@ -18,7 +32,7 @@ export const TextField = ({
       control={control}
       defaultValue={defaultValue}
       render={({ field }) => (
-        <MuiTextField
+        <StyledTextField
           {...field}
           type={type}
           label={label}
@@ -26,6 +40,8 @@ export const TextField = ({
           className={className}
           helperText={helperText}
           error={!!helperText}
+          autoComplete='off'
+          {...props}
         />
       )}
     />
