@@ -1,3 +1,5 @@
+## Usage
+
 ```javascript
 
 /* Install dependencies */
